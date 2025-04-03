@@ -1,5 +1,6 @@
 # Environment variables
 .env
+*.env
 
 # Virtual environment
 venv/
@@ -8,17 +9,23 @@ env/
 */venv/
 */.venv/
 */env/
+*/.env
 
 # Python cache/compiled files
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
 
 # OS-specific files
 .DS_Store
 Thumbs.db
 
-# IDE folders (optional but recommended)
+# IDE folders
 .vscode/
 .idea/
+
+# Other common ignores
+*.log
+*.pot
+*.pyc
+*.swp
+*~
