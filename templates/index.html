@@ -13,18 +13,25 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            /* Remove justify-content: center; if you want chat at top */
+            /* justify-content: center; */
             min-height: 100vh;
         }
 
         #chat-container {
             width: 95%;
             max-width: 600px;
-            margin: 0 auto;
+            /* Remove margin: 0 auto; if using flexbox alignment */
+            /* margin: 0 auto; */
             background: #f9f9f9;
             border: 1px solid #ddd;
             border-radius: 10px;
             overflow: hidden;
+            /* Add flex properties if chat-container should grow */
+            display: flex;
+            flex-direction: column;
+            /* Set a max-height or height if needed */
+            /* max-height: 90vh; */
         }
 
         h2 {
@@ -34,34 +41,68 @@
             color: #333;
             font-size: 1.4em;
             text-align: center;
+            flex-shrink: 0; /* Prevent header from shrinking */
         }
 
         #chat-log {
-            height: 300px;
+            /* Let chat log grow to fill space */
+            flex-grow: 1;
+            height: 300px; /* Or set initial height */
             overflow-y: auto;
             padding: 15px;
             background: #fff;
             color: #333;
             font-size: 0.95em;
+            border-top: 1px solid #ddd; /* Add separator */
+            border-bottom: 1px solid #ddd; /* Add separator */
+
         }
 
         #chat-log p {
             margin: 10px 0;
             padding: 10px 15px;
             border-radius: 10px;
-            max-width: 75%;
+            max-width: 85%; /* Slightly increase max width */
             word-wrap: break-word;
+            clear: both; /* Ensure floats don't overlap */
+            position: relative; /* For potential future additions */
+            line-height: 1.4; /* Improve readability */
         }
 
-        #chat-log p:nth-child(odd) {
-            background: #e0f7fa;
-            margin-left: auto;
+        /* User message styling */
+        .user-message {
+            background: #dcf8c6; /* Light green for user */
+            float: right; /* Align user messages to the right */
+            margin-left: 15%; /* Push away from left edge */
             text-align: right;
         }
 
-        #chat-log p:nth-child(even) {
-            background: #eeeeee;
+        /* Bot message styling */
+        .bot-message {
+            background: #eeeeee; /* Grey for bot */
+            float: left; /* Align bot messages to the left */
+            margin-right: 15%; /* Push away from right edge */
             text-align: left;
+        }
+        /* Error message styling */
+        .error-message {
+             background: #ffebee; /* Light red for errors */
+             color: #c62828; /* Darker red text */
+             border: 1px solid #e57373;
+             float: left;
+             margin-right: 15%;
+             text-align: left;
+         }
+
+        #chat-log ul, #chat-log ol {
+            list-style-position: inside; /* Indent bullets/numbers */
+            padding-left: 5px; /* Adjust padding if needed */
+            margin: 10px 0;
+            color: #333;
+        }
+
+        #chat-log li {
+            margin: 5px 0;
         }
 
         .input-container {
@@ -70,6 +111,7 @@
             display: flex;
             gap: 10px;
             background: #f1f1f1;
+            flex-shrink: 0; /* Prevent input area from shrinking */
         }
 
         #user-input {
@@ -89,119 +131,179 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 1em;
+            transition: background-color 0.2s ease; /* Add transition */
         }
 
         button:hover {
             background: #555;
         }
+        button:active {
+             background: #222; /* Darker on click */
+         }
 
-        #chat-log ul {
-            list-style-type: disc;
-            padding-left: 20px;
-            margin: 10px 0;
-            color: #333;
-        }
-
-        #chat-log li {
-            margin: 5px 0;
-        }
 
         @media (max-width: 600px) {
             #chat-log {
-                height: 40vh;
+                /* Use vh for viewport height consistency */
+                height: 65vh; /* Adjust as needed */
             }
             button {
                 padding: 10px;
                 font-size: 0.9em;
             }
             .input-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
+                 /* Keep as row but allow wrapping if needed */
+                 /* flex-direction: column; */
+                 /* align-items: stretch; */
+                 padding: 10px;
+             }
             #user-input {
-                margin-bottom: 10px;
+                /* margin-bottom: 10px; */
             }
-}
+            #chat-log p {
+                 max-width: 90%; /* Allow slightly wider messages on mobile */
+                 margin-left: 5%;
+                 margin-right: 5%;
+            }
+            .user-message {
+                 margin-left: 10%;
+             }
+            .bot-message, .error-message {
+                 margin-right: 10%;
+             }
+        }
 
-
-.footer-credit {
-    margin-top: 30px; /* Space above the credit line */
-    font-size: 0.85em; /* Smaller font size */
-    color: #888;      /* Grey color */
-    text-align: center; /* Ensure it's centered */
-}
+        .footer-credit {
+            margin-top: 20px; /* Reduced Space above the credit line */
+            margin-bottom: 10px; /* Add space below */
+            font-size: 0.8em; /* Smaller font size */
+            color: #aaa;      /* Lighter grey color */
+            text-align: center; /* Ensure it's centered */
+            width: 100%; /* Ensure it takes full width for centering */
         }
     </style>
 </head>
 <body>
     <div id="chat-container">
         <h2>Ada</h2>
-        <div id="chat-log"></div>
-        <div class="input-container">
-            <input type="text" id="user-input" placeholder="Enter your message...">
-            <button onclick="sendMessage()">Send</button>
+        <div id="chat-log">
+             <!-- Chat messages will appear here -->
         </div>
-<p class="footer-credit">Created by HOT®</p>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Enter your message..." autocomplete="off">
+            <button id="send-button" onclick="sendMessage()">Send</button>
+        </div>
     </div>
+    <p class="footer-credit">Created by HOT®</p>
 
     <script>
         const chatLog = document.getElementById('chat-log');
         const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button'); // Get button reference
 
         function sendMessage() {
             const message = userInput.value.trim();
-            if (message === '') return;
+            if (message === '') return; // Don't send empty messages
 
-            appendMessage('You: ' + message, 'user');
-            userInput.value = '';
+            appendMessage(message, 'user'); // Display user message immediately
+            userInput.value = ''; // Clear input field
+            userInput.disabled = true;  // Disable input during request
+            sendButton.disabled = true; // Disable button during request
+            sendButton.textContent = 'Sending...'; // Indicate loading
 
-            fetch('https://ada-jvmc.onrender.com/chat', {
+            // --- *** FETCH CALL WITH RELATIVE PATH *** ---
+            fetch('/chat', { // Use relative path since HTML is served by same app
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ message: message })
+                body: JSON.stringify({ message: message }) // Send message in correct JSON format
             })
             .then(response => {
+                // Check if the response status is OK (e.g., 200)
                 if (!response.ok) {
-                    throw new Error(`HTTP ERROR! STATUS: ${response.status}`);
+                    // Try to get error details from response body if possible
+                    return response.json().catch(() => {
+                        // If body isn't JSON or empty, create a generic error
+                         throw new Error(`HTTP error! Status: ${response.status}`);
+                    }).then(errorData => {
+                         // Throw an error with message from API if available
+                         throw new Error(errorData.error || `HTTP error! Status: ${response.status}`);
+                    });
                 }
+                // If response is OK, parse the JSON
                 return response.json();
             })
             .then(data => {
+                // Check if the parsed data contains an error message from the API
                 if (data.error) {
-                    appendMessage('Error: ' + data.error, 'error');
+                    appendMessage(data.error, 'error'); // Display API error
+                } else if (data.response) {
+                    // If no error and response exists, display bot message
+                    appendMessage(data.response, 'bot');
                 } else {
-                    appendMessage('Ada: ' + data.response, 'bot');
+                     // Handle unexpected successful response format
+                     appendMessage('Received an unexpected response format.', 'error');
+                     console.warn("Unexpected successful response:", data);
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                appendMessage('Error: ' + error, 'error');
-            });
+                // Handle network errors or errors thrown from .then blocks
+                console.error('Fetch Error:', error);
+                // Display a user-friendly error message
+                appendMessage(`Error communicating with the bot: ${error.message}`, 'error');
+            })
+            .finally(() => {
+                 // This block executes whether the fetch succeeded or failed
+                 userInput.disabled = false; // Re-enable input
+                 sendButton.disabled = false; // Re-enable button
+                 sendButton.textContent = 'Send'; // Restore button text
+                 userInput.focus(); // Set focus back to input for convenience
+             });
         }
 
-        function appendMessage(message, type) {
+        function appendMessage(htmlContent, type) {
             const messageElement = document.createElement('p');
-
+            // Apply class based on type for styling
             if (type === 'user') {
-                messageElement.style.textAlign = 'right';
+                messageElement.className = 'user-message';
+                 // For user message, sanitize slightly (optional, basic)
+                 // Avoids user injecting harmful HTML if you just displayed raw input
+                 // But since we add "You: " it's less direct.
+                 // For simplicity, we'll just set innerHTML for now as we control "You: "
+                 messageElement.innerHTML = "<strong>You:</strong> " + htmlContent.replace(/</g, "<").replace(/>/g, ">");
             } else if (type === 'bot') {
-                messageElement.style.textAlign = 'left';
+                messageElement.className = 'bot-message';
+                messageElement.innerHTML = "<strong>Ada:</strong> " + htmlContent; // Bot response is already formatted HTML
             } else if (type === 'error') {
-                messageElement.style.color = 'red';
+                messageElement.className = 'error-message';
+                messageElement.innerHTML = "<strong>Error:</strong> " + htmlContent.replace(/</g, "<").replace(/>/g, ">"); // Sanitize error text
+            } else {
+                 messageElement.textContent = htmlContent; // Default fallback
             }
 
-            messageElement.innerHTML = message;
             chatLog.appendChild(messageElement);
+            // Scroll to the bottom of the chat log
             chatLog.scrollTop = chatLog.scrollHeight;
         }
 
+        // Add event listener for the Enter key on the input field
         userInput.addEventListener('keyup', function(event) {
+            // Check if the key pressed was Enter
             if (event.key === 'Enter') {
+                // Prevent the default Enter key action (like form submission)
+                event.preventDefault();
+                // Trigger the sendMessage function
                 sendMessage();
             }
         });
+
+        // Optional: Add an initial message from the bot
+         window.addEventListener('load', () => {
+             appendMessage("Hi! How can I help you today?", 'bot');
+             userInput.focus(); // Focus input on load
+         });
+
     </script>
 </body>
 </html>
